@@ -395,7 +395,7 @@ dependencies = [
  "assert_matches",
  "c8y_api",
  "c8y_smartrest",
- "clap 3.2.14",
+ "clap 3.2.16",
  "csv",
  "download",
  "mockall",
@@ -424,7 +424,7 @@ dependencies = [
  "assert_matches",
  "c8y_api",
  "c8y_smartrest",
- "clap 3.2.14",
+ "clap 3.2.16",
  "csv",
  "easy_reader",
  "filetime",
@@ -549,9 +549,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.14"
+version = "3.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54635806b078b7925d6e36810b1755f2a4b5b4d57560432c1ecf60bcbe10602b"
+checksum = "a3dbbb6653e7c55cc8595ad3e1f7be8f32aba4eb7ff7f0fd1163d4f3d137c0a9"
 dependencies = [
  "atty",
  "bitflags",
@@ -566,9 +566,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.2.7"
+version = "3.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "759bf187376e1afa7b85b959e6a664a3e7a95203415dba952ad19139e798f902"
+checksum = "9ba52acd3b0a5c33aeada5cdaa3267cdc7c594a98731d4268cdc1532f4264cb4"
 dependencies = [
  "heck 0.4.0",
  "proc-macro-error",
@@ -1505,6 +1505,12 @@ dependencies = [
  "test-case",
  "tokio",
 ]
+
+[[package]]
+name = "maplit"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
 
 [[package]]
 name = "matches"
@@ -2775,7 +2781,7 @@ dependencies = [
  "assert_matches",
  "base64",
  "certificate",
- "clap 3.2.14",
+ "clap 3.2.16",
  "hyper",
  "mockito",
  "mqtt_tests",
@@ -2808,7 +2814,7 @@ dependencies = [
  "assert-json-diff",
  "assert_cmd",
  "async-trait",
- "clap 3.2.14",
+ "clap 3.2.16",
  "flockfile",
  "futures",
  "mqtt_channel",
@@ -2835,7 +2841,7 @@ dependencies = [
 name = "tedge_apama_plugin"
 version = "0.7.3"
 dependencies = [
- "clap 3.2.14",
+ "clap 3.2.16",
  "roxmltree",
  "tedge_test_utils",
  "thiserror",
@@ -2847,7 +2853,7 @@ name = "tedge_apt_plugin"
 version = "0.7.3"
 dependencies = [
  "anyhow",
- "clap 3.2.14",
+ "clap 3.2.16",
  "csv",
  "hamcrest2",
  "reqwest",
@@ -2877,7 +2883,7 @@ dependencies = [
 name = "tedge_dummy_plugin"
 version = "0.7.3"
 dependencies = [
- "clap 3.2.14",
+ "clap 3.2.16",
  "thiserror",
 ]
 
@@ -2894,7 +2900,7 @@ dependencies = [
  "c8y_api",
  "c8y_smartrest",
  "c8y_translator",
- "clap 3.2.14",
+ "clap 3.2.16",
  "clock",
  "csv",
  "download",
@@ -2941,6 +2947,7 @@ dependencies = [
  "async-stream",
  "futures",
  "inotify",
+ "maplit",
  "nix",
  "strum_macros",
  "tedge_test_utils",
@@ -2959,7 +2966,7 @@ name = "tedge_watchdog"
 version = "0.7.3"
 dependencies = [
  "anyhow",
- "clap 3.2.14",
+ "clap 3.2.16",
  "freedesktop_entry_parser",
  "futures",
  "mqtt_channel",
