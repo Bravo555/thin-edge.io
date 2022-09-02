@@ -395,7 +395,7 @@ dependencies = [
  "assert_matches",
  "c8y_api",
  "c8y_smartrest",
- "clap 3.2.14",
+ "clap 3.2.20",
  "csv",
  "download",
  "mockall",
@@ -424,7 +424,7 @@ dependencies = [
  "assert_matches",
  "c8y_api",
  "c8y_smartrest",
- "clap 3.2.14",
+ "clap 3.2.20",
  "csv",
  "easy_reader",
  "filetime",
@@ -549,9 +549,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.14"
+version = "3.2.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54635806b078b7925d6e36810b1755f2a4b5b4d57560432c1ecf60bcbe10602b"
+checksum = "23b71c3ce99b7611011217b366d923f1d0a7e07a92bb2dbf1e84508c673ca3bd"
 dependencies = [
  "atty",
  "bitflags",
@@ -566,9 +566,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.2.7"
+version = "3.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "759bf187376e1afa7b85b959e6a664a3e7a95203415dba952ad19139e798f902"
+checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
 dependencies = [
  "heck 0.4.0",
  "proc-macro-error",
@@ -2781,7 +2781,7 @@ dependencies = [
  "assert_matches",
  "base64",
  "certificate",
- "clap 3.2.14",
+ "clap 3.2.20",
  "hyper",
  "mockito",
  "mqtt_tests",
@@ -2814,7 +2814,7 @@ dependencies = [
  "assert-json-diff",
  "assert_cmd",
  "async-trait",
- "clap 3.2.14",
+ "clap 3.2.20",
  "flockfile",
  "futures",
  "mqtt_channel",
@@ -2841,7 +2841,7 @@ dependencies = [
 name = "tedge_apama_plugin"
 version = "0.7.4"
 dependencies = [
- "clap 3.2.14",
+ "clap 3.2.20",
  "roxmltree",
  "tedge_test_utils",
  "thiserror",
@@ -2853,7 +2853,7 @@ name = "tedge_apt_plugin"
 version = "0.7.4"
 dependencies = [
  "anyhow",
- "clap 3.2.14",
+ "clap 3.2.20",
  "csv",
  "hamcrest2",
  "reqwest",
@@ -2883,7 +2883,7 @@ dependencies = [
 name = "tedge_dummy_plugin"
 version = "0.7.4"
 dependencies = [
- "clap 3.2.14",
+ "clap 3.2.20",
  "thiserror",
 ]
 
@@ -2900,7 +2900,7 @@ dependencies = [
  "c8y_api",
  "c8y_smartrest",
  "c8y_translator",
- "clap 3.2.14",
+ "clap 3.2.20",
  "clock",
  "csv",
  "download",
@@ -2966,7 +2966,7 @@ name = "tedge_watchdog"
 version = "0.7.4"
 dependencies = [
  "anyhow",
- "clap 3.2.14",
+ "clap 3.2.20",
  "freedesktop_entry_parser",
  "futures",
  "mqtt_channel",
