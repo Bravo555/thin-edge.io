@@ -25,7 +25,7 @@ assets = [
 agent_interface = { path = "../agent_interface" }
 anyhow = "1.0"
 async-trait = "0.1"
-clap = { version = "3.2", features = ["cargo", "derive"] }
+clap = { version = "4.0", features = ["cargo", "derive"] }
 flockfile = { path = "../../common/flockfile" }
 futures-util = "0.3"
 hyper = { version = "0.14", features = ["full"] }
