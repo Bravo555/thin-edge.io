@@ -37,6 +37,9 @@ toml = "0.5"
 tracing = { version = "0.1", features = ["attributes", "log"] }
 url = "2.2"
 which = "4.2"
+aws-sdk-iot = "0.22.0"
+aws-config = "0.52.0"
+tokio = "1.12"
 
 [dev-dependencies]
 assert_cmd = "2.0"

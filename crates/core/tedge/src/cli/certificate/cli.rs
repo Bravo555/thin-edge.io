@@ -17,6 +17,10 @@ pub enum TEdgeCertCli {
         /// The device identifier to be used as the common name for the certificate
         #[clap(long = "device-id")]
         id: String,
+
+        /// CA used to sign the certificate
+        #[clap(long = "ca", arg_enum, value_parser)]
+        ca: Option<CreateCertCa>,
     },
 
     /// Show the device certificate, if any
@@ -35,11 +39,12 @@ impl BuildCommand for TEdgeCertCli {
         let config = context.config_repository.load()?;
 
         let cmd = match self {
-            TEdgeCertCli::Create { id } => {
+            TEdgeCertCli::Create { id, ca } => {
                 let cmd = CreateCertCmd {
                     id,
                     cert_path: config.query(DeviceCertPathSetting)?,
                     key_path: config.query(DeviceKeyPathSetting)?,
+                    ca,
                 };
                 cmd.into_boxed()
             }
@@ -87,4 +92,9 @@ pub enum UploadCertCli {
         /// The password is requested on /dev/tty, unless the $C8YPASS env var is set to the user password.
         username: String,
     },
+}
+
+#[derive(Debug, Clone, clap::ValueEnum)]
+pub enum CreateCertCa {
+    AWS,
 }

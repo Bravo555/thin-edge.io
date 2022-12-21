@@ -1,5 +1,7 @@
+use super::cli::CreateCertCa;
 use super::error::CertError;
 use crate::command::Command;
+use aws_config::meta::region::RegionProviderChain;
 use certificate::KeyCertPair;
 use certificate::NewCertificateConfig;
 use std::fs::File;
@@ -20,6 +22,8 @@ pub struct CreateCertCmd {
 
     /// The path where the device private key will be stored
     pub key_path: FilePath,
+
+    pub ca: Option<CreateCertCa>,
 }
 
 impl Command for CreateCertCmd {
@@ -29,18 +33,73 @@ impl Command for CreateCertCmd {
 
     fn execute(&self) -> anyhow::Result<()> {
         let config = NewCertificateConfig::default();
-        self.create_test_certificate(&config)?;
+        match self.ca {
+            None => {
+                self.create_test_certificate(&config).unwrap();
+            }
+            Some(CreateCertCa::AWS) => {
+                tokio::runtime::Builder::new_current_thread()
+                    .enable_all()
+                    .build()
+                    .unwrap()
+                    .block_on(async {
+                        let region_provider =
+                            RegionProviderChain::default_provider().or_else("eu-central-1");
+                        let aws_config =
+                            aws_config::from_env().region(region_provider).load().await;
+                        let client = aws_sdk_iot::Client::new(&aws_config);
+
+                        let self_cert =
+                            KeyCertPair::new_selfsigned_certificate(&config, &self.id).unwrap();
+                        let csr = self_cert.csr_string().unwrap();
+
+                        let csr_response = client
+                            .create_certificate_from_csr()
+                            .certificate_signing_request(csr)
+                            .send()
+                            .await
+                            .unwrap();
+
+                        let certificate_pem = csr_response.certificate_pem().unwrap();
+                        self.create_certificate_with_pem(&config, certificate_pem)
+                            .unwrap();
+                    });
+            }
+        }
         eprintln!("Certificate was successfully created");
         Ok(())
     }
 }
 
 impl CreateCertCmd {
+    fn create_certificate_with_pem(
+        &self,
+        config: &NewCertificateConfig,
+        cert_pem: &str,
+    ) -> Result<(), CertError> {
+        let cert = KeyCertPair::new_selfsigned_certificate(config, &self.id)?;
+        self.create_certificate_from_parts(&cert, cert_pem)
+    }
+
     fn create_test_certificate(&self, config: &NewCertificateConfig) -> Result<(), CertError> {
+        let cert = KeyCertPair::new_selfsigned_certificate(config, &self.id)?;
+        let cert_pem = cert.certificate_pem_string().unwrap();
+        self.create_certificate_from_parts(&cert, &cert_pem)
+    }
+
+    /// Saves a certificate and a private key into the `cert_path` and `key_path` directories. Cert
+    /// comes from `cert_pem` parameter and private key comes from `cert` parameter. I've done it
+    /// like this because it's scary crypto stuff I didn't want to break, but the readability here
+    /// should definitely be improved.
+    ///
+    /// TODO: clean up this method mess
+    fn create_certificate_from_parts(
+        &self,
+        cert: &KeyCertPair,
+        cert_pem: &str,
+    ) -> Result<(), CertError> {
         validate_parent_dir_exists(&self.cert_path).map_err(CertError::CertPathError)?;
         validate_parent_dir_exists(&self.key_path).map_err(CertError::KeyPathError)?;
-
-        let cert = KeyCertPair::new_selfsigned_certificate(config, &self.id)?;
 
         // Creating files with permission 644 owned by the MQTT broker
         let mut cert_file =
@@ -49,7 +108,6 @@ impl CreateCertCmd {
         let mut key_file = create_new_file(&self.key_path, crate::BROKER_USER, crate::BROKER_GROUP)
             .map_err(|err| err.key_context(self.key_path.clone()))?;
 
-        let cert_pem = cert.certificate_pem_string()?;
         cert_file.write_all(cert_pem.as_bytes())?;
         cert_file.sync_all()?;
 
@@ -105,6 +163,7 @@ mod tests {
             id: String::from(id),
             cert_path: cert_path.clone(),
             key_path: key_path.clone(),
+            ca: None,
         };
 
         assert_matches!(
@@ -132,6 +191,7 @@ mod tests {
             id: "my-device-id".into(),
             cert_path: cert_path.clone(),
             key_path: key_path.clone(),
+            ca: None,
         };
 
         assert!(cmd
@@ -153,6 +213,7 @@ mod tests {
             id: "my-device-id".into(),
             cert_path,
             key_path,
+            ca: None,
         };
 
         let cert_error = cmd
@@ -171,6 +232,7 @@ mod tests {
             id: "my-device-id".into(),
             cert_path,
             key_path,
+            ca: None,
         };
 
         let cert_error = cmd

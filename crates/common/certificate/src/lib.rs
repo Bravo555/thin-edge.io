@@ -139,6 +139,10 @@ impl KeyCertPair {
         Ok(self.certificate.serialize_pem()?)
     }
 
+    pub fn csr_string(&self) -> Result<String, CertificateError> {
+        Ok(self.certificate.serialize_request_pem()?)
+    }
+
     pub fn private_key_pem_string(&self) -> Result<Zeroizing<String>, CertificateError> {
         Ok(Zeroizing::new(self.certificate.serialize_private_key_pem()))
     }
