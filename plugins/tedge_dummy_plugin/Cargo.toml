@@ -15,5 +15,5 @@ conflicts = "tedge_dummy_plugin (<= 0.8.1)"
 breaks = "tedge_dummy_plugin (<= 0.8.1)"
 
 [dependencies]
-clap = { version = "3", features = ["derive"] }
+clap = { version = "4", features = ["derive"] }
 thiserror = "1.0"
