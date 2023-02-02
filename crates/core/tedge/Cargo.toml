@@ -18,7 +18,7 @@ maintainer-scripts = "../../../configuration/debian/tedge"
 anyhow = "1.0"
 base64 = "0.13"
 certificate = { path = "../../common/certificate" }
-clap = { version = "3", features = ["cargo", "derive"] }
+clap = { version = "4", features = ["cargo", "derive"] }
 hyper = { version = "0.14", default-features = false }
 reqwest = { version = "0.11", default-features = false, features = [
     "blocking",

@@ -389,7 +389,7 @@ dependencies = [
  "anyhow",
  "assert_matches",
  "c8y_api",
- "clap 3.2.23",
+ "clap 4.1.4",
  "csv",
  "download",
  "futures",
@@ -419,7 +419,7 @@ dependencies = [
  "anyhow",
  "assert_matches",
  "c8y_api",
- "clap 3.2.23",
+ "clap 4.1.4",
  "csv",
  "easy_reader",
  "filetime",
@@ -561,47 +561,17 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.2.23"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71655c45cb9845d3270c9d6df84ebe72b4dad3c2ba3f7023ad47c144e4e473a5"
-dependencies = [
- "atty",
- "bitflags",
- "clap_derive 3.2.18",
- "clap_lex 0.2.4",
- "indexmap",
- "once_cell",
- "strsim",
- "termcolor",
- "textwrap 0.16.0",
-]
-
-[[package]]
-name = "clap"
 version = "4.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f13b9c79b5d1dd500d20ef541215a6423c75829ef43117e1b4d17fd8af0b5d76"
 dependencies = [
  "bitflags",
- "clap_derive 4.1.0",
- "clap_lex 0.3.1",
+ "clap_derive",
+ "clap_lex",
  "is-terminal",
  "once_cell",
  "strsim",
  "termcolor",
-]
-
-[[package]]
-name = "clap_derive"
-version = "3.2.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea0c8bce528c4be4da13ea6fead8965e95b6073585a2f05204bd8f4119f82a65"
-dependencies = [
- "heck",
- "proc-macro-error",
- "proc-macro2 1.0.50",
- "quote 1.0.23",
- "syn 1.0.107",
 ]
 
 [[package]]
@@ -615,15 +585,6 @@ dependencies = [
  "proc-macro2 1.0.50",
  "quote 1.0.23",
  "syn 1.0.107",
-]
-
-[[package]]
-name = "clap_lex"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
-dependencies = [
- "os_str_bytes",
 ]
 
 [[package]]
@@ -3114,7 +3075,7 @@ dependencies = [
  "assert_matches",
  "base64 0.13.1",
  "certificate",
- "clap 3.2.23",
+ "clap 4.1.4",
  "hyper",
  "mockito",
  "mqtt_tests",
@@ -3146,7 +3107,7 @@ dependencies = [
  "assert_cmd",
  "async-stream",
  "async-trait",
- "clap 3.2.23",
+ "clap 4.1.4",
  "flockfile",
  "futures",
  "futures-util",
@@ -3180,7 +3141,7 @@ name = "tedge-apt-plugin"
 version = "0.9.0"
 dependencies = [
  "anyhow",
- "clap 3.2.23",
+ "clap 4.1.4",
  "csv",
  "hamcrest2",
  "reqwest",
@@ -3205,7 +3166,7 @@ dependencies = [
 name = "tedge-dummy-plugin"
 version = "0.9.0"
 dependencies = [
- "clap 3.2.23",
+ "clap 4.1.4",
  "thiserror",
 ]
 
@@ -3220,7 +3181,7 @@ dependencies = [
  "async-trait",
  "batcher",
  "c8y_api",
- "clap 3.2.23",
+ "clap 4.1.4",
  "clock",
  "csv",
  "download",
@@ -3257,7 +3218,7 @@ name = "tedge-watchdog"
 version = "0.9.0"
 dependencies = [
  "anyhow",
- "clap 3.2.23",
+ "clap 4.1.4",
  "freedesktop_entry_parser",
  "futures",
  "mqtt_channel",
@@ -3429,12 +3390,6 @@ dependencies = [
  "unicode-linebreak",
  "unicode-width",
 ]
-
-[[package]]
-name = "textwrap"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "222a222a5bfe1bba4a77b45ec488a741b3cb8872e5e499451fd7d0129c9c7c3d"
 
 [[package]]
 name = "thiserror"
