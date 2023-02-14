@@ -59,10 +59,6 @@ pub(crate) struct DeviceConfigDto {
     /// Defaults to $HOME/.tedge/tedge-certificate.crt
     pub(crate) cert_path: Option<FilePath>,
 
-    /// Path where the device's certificate signing request is stored.
-    /// Defaults to $HOME/.tedge/tedge.csr
-    pub(crate) csr_path: Option<FilePath>,
-
     #[serde(rename = "type")]
     pub(crate) device_type: Option<String>,
 }

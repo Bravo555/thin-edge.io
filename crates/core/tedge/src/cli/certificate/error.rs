@@ -40,22 +40,6 @@ pub enum CertError {
     )]
     KeyAlreadyExists { path: FilePath },
 
-    #[error(
-        r#"No certificate signing request has been attached to that device.
-        Missing file: {path:?}
-        Run `tedge cert create` to generate a new key and certificate.
-    "#
-    )]
-    CsrNotFound { path: FilePath },
-
-    #[error(
-        r#"A certificate signing request already exists and would be overwritten.
-        Existing file: {path:?}
-        Run `tedge cert remove` first to generate a new certificate and private key.
-    "#
-    )]
-    CsrAlreadyExists { path: FilePath },
-
     #[error(transparent)]
     ConfigError(#[from] crate::ConfigError),
 
@@ -67,9 +51,6 @@ pub enum CertError {
 
     #[error("Invalid device.key.path path: {0}")]
     KeyPathError(PathsError),
-
-    #[error("Invalid device.csr.path path: {0}")]
-    CSRPathError(PathsError),
 
     #[error(transparent)]
     CertificateError(#[from] certificate::CertificateError),
@@ -118,18 +99,6 @@ impl CertError {
             CertError::IoError(ref err) => match err.kind() {
                 std::io::ErrorKind::AlreadyExists => CertError::KeyAlreadyExists { path },
                 std::io::ErrorKind::NotFound => CertError::KeyNotFound { path },
-                _ => self,
-            },
-            _ => self,
-        }
-    }
-
-    /// Improve the error message in case the error in a IO error on the CSR file.
-    pub fn csr_context(self, path: FilePath) -> CertError {
-        match self {
-            CertError::IoError(ref err) => match err.kind() {
-                std::io::ErrorKind::AlreadyExists => CertError::CsrAlreadyExists { path },
-                std::io::ErrorKind::NotFound => CertError::CsrNotFound { path },
                 _ => self,
             },
             _ => self,

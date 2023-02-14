@@ -12,9 +12,6 @@ pub struct RemoveCertCmd {
 
     /// The path of the private key to be removed
     pub key_path: FilePath,
-
-    /// The path of the certificate signing request to be removed
-    pub csr_path: FilePath,
 }
 
 impl Command for RemoveCertCmd {
@@ -33,10 +30,7 @@ impl Command for RemoveCertCmd {
 
 impl RemoveCertCmd {
     fn remove_certificate(&self) -> Result<RemoveCertResult, CertError> {
-        match fs::remove_file(&self.cert_path)
-            .and_then(|()| fs::remove_file(&self.key_path))
-            .and_then(|()| fs::remove_file(&self.csr_path))
-        {
+        match fs::remove_file(&self.cert_path).and_then(|()| fs::remove_file(&self.key_path)) {
             Ok(()) => Ok(RemoveCertResult::Removed),
             Err(err) if err.kind() == io::ErrorKind::NotFound => Ok(RemoveCertResult::NotFound),
             Err(err) => Err(err.into()),

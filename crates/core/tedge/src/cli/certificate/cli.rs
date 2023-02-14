@@ -40,7 +40,6 @@ impl BuildCommand for TEdgeCertCli {
                     id,
                     cert_path: config.query(DeviceCertPathSetting)?,
                     key_path: config.query(DeviceKeyPathSetting)?,
-                    csr_path: config.query(DeviceCsrPathSetting)?,
                 };
                 cmd.into_boxed()
             }
@@ -56,7 +55,6 @@ impl BuildCommand for TEdgeCertCli {
                 let cmd = RemoveCertCmd {
                     cert_path: config.query(DeviceCertPathSetting)?,
                     key_path: config.query(DeviceKeyPathSetting)?,
-                    csr_path: config.query(DeviceCsrPathSetting)?,
                 };
                 cmd.into_boxed()
             }

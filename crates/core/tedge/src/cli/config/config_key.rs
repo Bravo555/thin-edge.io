@@ -43,7 +43,6 @@ impl ConfigKey {
             config_key!(DeviceTypeSetting),
             config_key!(DeviceKeyPathSetting),
             config_key!(DeviceCertPathSetting),
-            config_key!(DeviceCsrPathSetting),
             config_key!(C8yUrlSetting),
             config_key!(C8yRootCertPathSetting),
             config_key!(C8ySmartRestTemplates),
