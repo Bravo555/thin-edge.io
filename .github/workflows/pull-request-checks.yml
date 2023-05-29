@@ -242,7 +242,7 @@ jobs:
 
       - name: Enable cache
         # https://github.com/marketplace/actions/rust-cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@v2.4.0
 
       - name: Cargo clippy --version
         uses: actions-rs/cargo@v1
@@ -300,7 +300,7 @@ jobs:
 
       - name: Enable cache
         # https://github.com/marketplace/actions/rust-cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@v2.4.0
 
       - name: Cargo version
         uses: actions-rs/cargo@v1
@@ -399,11 +399,11 @@ jobs:
         with:
           components: llvm-tools-preview
 
-      - name: cargo install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
-
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.4.0
+
+      - name: cargo install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
 
       - name: cargo llvm-cov
         run: cargo llvm-cov --locked --all-features --codecov --output-path codecov.json
