@@ -554,6 +554,32 @@ mod tests {
         Ok(())
     }
 
+    #[tokio::test]
+    async fn download_to_directory() {
+        let temp_dir = tempdir().unwrap();
+        let _mock1 = mock("GET", "/some_file.txt")
+            .with_status(200)
+            .with_body(b"hello")
+            .create();
+
+        let target_file_path = temp_dir.path().join("some_file.txt");
+        fs::File::create(&target_file_path).unwrap();
+
+        let mut target_url = mockito::server_url();
+        target_url.push_str("/some_file.txt");
+
+        let url = DownloadInfo::new(&target_url);
+
+        let downloader = Downloader::new(&target_file_path, PermissionEntry::default());
+        downloader.download(&url).await.unwrap();
+
+        let file_content = std::fs::read(target_file_path).unwrap();
+
+        assert_eq!(file_content, "hello".as_bytes());
+
+        downloader.cleanup().await.unwrap();
+    }
+
     fn create_file_with_size(size: usize) -> Result<NamedTempFile, anyhow::Error> {
         let mut file = NamedTempFile::new()?;
         let data: String = "Some data!".into();
