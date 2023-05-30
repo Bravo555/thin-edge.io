@@ -451,16 +451,12 @@ mod tests {
     }
 
     // Parameters:
-    //
-    // status code
-    //
-    // bearer token boolean
-    //
-    // maybe url
-    //
-    // expected std error
-    //
-    // description
+
+    // - status code
+    // - bearer token boolean
+    // - maybe url
+    // - expected std error
+    // - description
     #[test_case(
         200,
         false,
