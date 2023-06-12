@@ -88,3 +88,29 @@ pub struct ContentRangeParseError {
     reason: &'static str,
     value: header::HeaderValue,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn correct_chunk_pos_for_response_status_info() {
+        let mut response = http::Response::new("hello there");
+        *response.status_mut() = http::StatusCode::ACCEPTED;
+
+        let start = response_range_start(&response.into()).unwrap();
+        assert_eq!(start, 0);
+    }
+
+    #[test]
+    fn error_for_response_status_server_error() {
+        let mut response = http::Response::new("hello there");
+        *response.status_mut() = http::StatusCode::INTERNAL_SERVER_ERROR;
+
+        let start = response_range_start(&response.into()).unwrap_err();
+        assert!(matches!(
+            start,
+            InvalidResponseError::UnexpectedStatus(http::StatusCode::INTERNAL_SERVER_ERROR)
+        ));
+    }
+}
