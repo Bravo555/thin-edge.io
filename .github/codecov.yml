@@ -18,5 +18,5 @@ ignore:
 
 # Make comments less noisy
 comment:
-  layout: "files"
+  layout: "header, components, files"
   require_changes: yes
