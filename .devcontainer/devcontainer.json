@@ -37,11 +37,13 @@
 				"python.testing.unittestEnabled": false,
 				"python.testing.pytestEnabled": false,
 				"python.linting.pylintPath": "pylint",
-				"robot.codeFormatter": "builtinTidy"
+				"robot.codeFormatter": "builtinTidy",
 				// "python.testing.pytestArgs": [
 				// 	"integration",
 				// 	"--log-cli-level=INFO"
 				// ]
+
+				"dev.containers.gitCredentialHelperConfigLocation": "none"
 			},
 			
 			// Add the IDs of extensions you want installed when the container is created.
@@ -70,7 +72,7 @@
 			]
 		}
 	},
-	"postCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && rustup component add rls rust-analysis rust-src rustfmt clippy",
+	"postCreateCommand": "rustup component add rls rust-analysis rust-src rustfmt clippy",
 
 	// Use root as there are some issues with cross using the docker commands in some environments (e.g. colima on MacOs)
 	"remoteUser": "root"

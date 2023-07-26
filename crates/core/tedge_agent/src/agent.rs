@@ -25,7 +25,7 @@ use tedge_utils::file::create_directory_with_defaults;
 use tracing::info;
 use tracing::instrument;
 
-const TEDGE_AGENT: &str = "tedge-agent";
+const MQTT_SESSION_NAME: &str = "tedge-agent";
 
 #[derive(Debug, Clone)]
 pub struct AgentConfig {
@@ -52,8 +52,7 @@ impl AgentConfig {
 
         let mqtt_config = tedge_config
             .mqtt_config()?
-            .with_max_packet_size(10 * 1024 * 1024)
-            .with_session_name(TEDGE_AGENT);
+            .with_max_packet_size(10 * 1024 * 1024);
 
         // HTTP config
         let data_dir = tedge_config.data.path.clone();
@@ -141,12 +140,7 @@ impl Agent {
             RestartManagerBuilder::new(self.config.restart_config.clone());
 
         // Mqtt actor
-        let mut mqtt_actor_builder = MqttActorBuilder::new(
-            self.config
-                .mqtt_config
-                .clone()
-                .with_session_name(TEDGE_AGENT),
-        );
+        let mut mqtt_actor_builder = MqttActorBuilder::new(self.config.mqtt_config.clone());
 
         // Software update actor
         let mut software_update_builder =
@@ -163,7 +157,7 @@ impl Agent {
         let signal_actor_builder = SignalActor::builder(&runtime.get_handle());
 
         // Health actor
-        let health_actor = HealthMonitorBuilder::new(TEDGE_AGENT, &mut mqtt_actor_builder);
+        let health_actor = HealthMonitorBuilder::new(MQTT_SESSION_NAME, &mut mqtt_actor_builder);
 
         // Tedge to Te topic converter
         let tedge_to_te_converter = create_tedge_to_te_converter(&mut mqtt_actor_builder)?;

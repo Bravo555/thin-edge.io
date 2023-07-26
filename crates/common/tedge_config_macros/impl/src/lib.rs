@@ -43,7 +43,7 @@ pub fn generate_configuration(tokens: TokenStream) -> Result<TokenStream, syn::E
             field.examples.iter().enumerate().map(move |(n, example)| {
                 let name = quote::format_ident!(
                     "example_value_can_be_deserialized_for_{}_example_{n}",
-                    key.join("_")
+                    key.join("_").replace('-', "_")
                 );
                 let span = example.span();
                 let example = example.as_ref();

@@ -1,3 +1,16 @@
+//! Handles cloud-agnostic operations.
+//!
+//! The Tedge Agent addresses cloud-agnostic software management operations e.g.
+//! listing current installed software list, software update, software removal.
+//! Also, the Tedge Agent calls an SM Plugin(s) to execute an action defined by
+//! a received operation.
+//!
+//! It also has following capabilities:
+//!
+//! - File transfer HTTP server
+//! - Restart management
+//! - Software management
+
 use agent::AgentConfig;
 use camino::Utf8PathBuf;
 use clap::Parser;

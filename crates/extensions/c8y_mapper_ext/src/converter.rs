@@ -352,7 +352,8 @@ impl CumulocityConverter {
         let mut mqtt_messages: Vec<Message> = Vec::new();
 
         // Send the init messages
-        if check_tedge_agent_status(message)? {
+        if is_tedge_agent_up(message)? {
+            info!("test: {message:?}");
             create_tedge_agent_supported_ops(self.ops_dir.clone()).await?;
             mqtt_messages.push(create_get_software_list_message()?);
         }
@@ -1137,10 +1138,10 @@ pub struct HealthStatus {
     pub status: String,
 }
 
-pub fn check_tedge_agent_status(message: &Message) -> Result<bool, ConversionError> {
-    if message.topic.name.eq(TEDGE_AGENT_HEALTH_TOPIC) {
+pub fn is_tedge_agent_up(message: &Message) -> Result<bool, ConversionError> {
+    if message.topic.name == TEDGE_AGENT_HEALTH_TOPIC {
         let status: HealthStatus = serde_json::from_str(message.payload_str()?)?;
-        return Ok(status.status.eq("up"));
+        return Ok(status.status == "up");
     }
     Ok(false)
 }

@@ -6,26 +6,26 @@ FROM mcr.microsoft.com/devcontainers/rust:1-${VARIANT}
 # [Optional] Uncomment this section to install additional packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-        # apt dependencies
-        apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
-        # Debian packaging utilities
-        equivs \
-        dpkg-dev \
-        fakeroot \
-        # Utilities
-        vim \
-        bash-completion \
-        iputils-ping \
-        # Enable systemd
-        systemd \
-        # Testing dependencies
-        docker \
-        python3 \
-        python3-pip \
-        python3-venv \
-        # tedge dependencies
-        mosquitto \
-        mosquitto-clients
+    # apt dependencies
+    apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
+    # Debian packaging utilities
+    equivs \
+    dpkg-dev \
+    fakeroot \
+    # Utilities
+    vim \
+    bash-completion \
+    iputils-ping \
+    # Enable systemd
+    systemd \
+    # Testing dependencies
+    docker \
+    python3 \
+    python3-pip \
+    python3-venv \
+    # tedge dependencies
+    mosquitto \
+    mosquitto-clients
 
 # Install gh utility
 RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -51,6 +51,8 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash 
 
 # Update python deps
 RUN pip3 install --upgrade pip
+
+RUN apt-get update && apt-get install gnupg2 -y
 
 # Delete the dummy systemctl command added by the base image
 RUN rm -f /usr/local/bin/systemctl
