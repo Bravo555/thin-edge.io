@@ -227,6 +227,8 @@ jobs:
       - name: Check disk space before setting up
         run: df -BM
 
+      - run: echo $AGENT_TOOLSDIRECTORY
+
       - name: Reclaim some disk space
         run: |
           sudo rm -rf /usr/share/dotnet
