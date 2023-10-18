@@ -47,4 +47,8 @@ pub enum WatchdogError {
 
     #[error(transparent)]
     ParseError(#[from] Parse),
+
+    #[allow(clippy::enum_variant_names)]
+    #[error(transparent)]
+    WatchdogError(#[from] anyhow::Error),
 }
