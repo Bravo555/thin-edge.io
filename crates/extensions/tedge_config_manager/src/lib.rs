@@ -19,6 +19,9 @@ use tedge_actors::NoConfig;
 use tedge_actors::RuntimeRequest;
 use tedge_actors::RuntimeRequestSink;
 use tedge_actors::ServiceProvider;
+use tedge_api::mqtt_topics::ChannelFilter;
+use tedge_api::mqtt_topics::EntityTopicId;
+use tedge_api::ThinEdgeMessage;
 use tedge_file_system_ext::FsWatchEvent;
 use tedge_mqtt_ext::MqttMessage;
 use tedge_mqtt_ext::TopicFilter;
@@ -40,6 +43,7 @@ pub struct ConfigManagerBuilder {
     download_sender: DynSender<ConfigDownloadRequest>,
     upload_sender: DynSender<ConfigUploadRequest>,
     signal_sender: mpsc::Sender<RuntimeRequest>,
+    entity_mqtt_publisher: DynSender<ThinEdgeMessage>,
 }
 
 impl ConfigManagerBuilder {
@@ -53,6 +57,7 @@ impl ConfigManagerBuilder {
             NoConfig,
         >,
         uploader_actor: &mut impl ServiceProvider<ConfigUploadRequest, ConfigUploadResult, NoConfig>,
+        entity_mqtt_actor: &mut impl ServiceProvider<ThinEdgeMessage, ThinEdgeMessage, ChannelFilter>,
     ) -> Result<Self, FileError> {
         Self::init(&config).await?;
 
@@ -68,6 +73,9 @@ impl ConfigManagerBuilder {
 
         let mqtt_publisher =
             mqtt.connect_consumer(Self::subscriptions(&config), events_sender.clone().into());
+
+        let entity_mqtt_publisher = entity_mqtt_actor
+            .connect_consumer(ChannelFilter::AnyCommand, events_sender.clone().into());
 
         let download_sender =
             downloader_actor.connect_consumer(NoConfig, events_sender.clone().into());
@@ -87,6 +95,7 @@ impl ConfigManagerBuilder {
             download_sender,
             upload_sender,
             signal_sender,
+            entity_mqtt_publisher,
         })
     }
 

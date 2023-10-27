@@ -29,6 +29,9 @@ pub enum ConfigManagementError {
     #[error("Directory {path} is not found.")]
     DirectoryNotFound { path: std::path::PathBuf },
 
+    #[error("Not valid utf8")]
+    InvalidUtf8(#[from] std::str::Utf8Error),
+
     #[error(transparent)]
     Other(#[from] anyhow::Error),
 }

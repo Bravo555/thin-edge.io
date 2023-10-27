@@ -3690,6 +3690,7 @@ dependencies = [
  "tedge_config",
  "tedge_config_manager",
  "tedge_downloader_ext",
+ "tedge_entity_mqtt_ext",
  "tedge_file_system_ext",
  "tedge_health_ext",
  "tedge_log_manager",
@@ -3738,6 +3739,7 @@ dependencies = [
  "tedge_config",
  "tedge_config_manager",
  "tedge_downloader_ext",
+ "tedge_entity_mqtt_ext",
  "tedge_file_system_ext",
  "tedge_health_ext",
  "tedge_mqtt_ext",
@@ -3957,6 +3959,7 @@ dependencies = [
  "tedge_api",
  "tedge_config",
  "tedge_downloader_ext",
+ "tedge_entity_mqtt_ext",
  "tedge_file_system_ext",
  "tedge_mqtt_ext",
  "tedge_test_utils",
@@ -3982,6 +3985,23 @@ dependencies = [
  "tokio",
  "uzers",
  "whoami",
+]
+
+[[package]]
+name = "tedge_entity_mqtt_ext"
+version = "1.0.0-rc.1"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "mqtt_channel",
+ "serde_json",
+ "tedge_actors",
+ "tedge_api",
+ "tedge_config",
+ "tedge_mqtt_ext",
+ "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

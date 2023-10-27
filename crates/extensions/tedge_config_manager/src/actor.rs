@@ -18,7 +18,11 @@ use tedge_actors::Sender;
 use tedge_api::messages::CommandStatus;
 use tedge_api::messages::ConfigSnapshotCmdPayload;
 use tedge_api::messages::ConfigUpdateCmdPayload;
+use tedge_api::mqtt_topics::Channel;
+use tedge_api::mqtt_topics::ChannelFilter;
+use tedge_api::mqtt_topics::OperationType;
 use tedge_api::Jsonify;
+use tedge_api::ThinEdgeMessage;
 use tedge_downloader_ext::DownloadRequest;
 use tedge_downloader_ext::DownloadResult;
 use tedge_file_system_ext::FsWatchEvent;
@@ -43,8 +47,8 @@ pub type ConfigDownloadResult = (MqttTopic, DownloadResult);
 pub type ConfigUploadRequest = (MqttTopic, UploadRequest);
 pub type ConfigUploadResult = (MqttTopic, UploadResult);
 
-fan_in_message_type!(ConfigInput[MqttMessage, FsWatchEvent, ConfigDownloadResult, ConfigUploadResult] : Debug);
-fan_in_message_type!(ConfigOutput[MqttMessage, ConfigDownloadRequest, ConfigUploadRequest]: Debug);
+fan_in_message_type!(ConfigInput[ThinEdgeMessage, MqttMessage, FsWatchEvent, ConfigDownloadResult, ConfigUploadResult] : Debug);
+fan_in_message_type!(ConfigOutput[ThinEdgeMessage, MqttMessage, ConfigDownloadRequest, ConfigUploadRequest]: Debug);
 
 pub struct ConfigManagerActor {
     config: ConfigManagerConfig,
@@ -67,6 +71,9 @@ impl Actor for ConfigManagerActor {
 
         while let Some(event) = self.input_receiver.recv().await {
             let result = match event {
+                ConfigInput::ThinEdgeMessage(message) => {
+                    self.process_thin_edge_message(message).await
+                }
                 ConfigInput::MqttMessage(message) => self.process_mqtt_message(message).await,
                 ConfigInput::FsWatchEvent(event) => self.process_file_watch_events(event).await,
                 ConfigInput::ConfigDownloadResult((topic, result)) => {
@@ -104,6 +111,13 @@ impl ConfigManagerActor {
             download_sender,
             upload_sender,
         }
+    }
+
+    async fn process_thin_edge_message(
+        &mut self,
+        message: ThinEdgeMessage,
+    ) -> Result<(), ChannelError> {
+        Ok(())
     }
 
     async fn process_mqtt_message(&mut self, message: MqttMessage) -> Result<(), ChannelError> {
@@ -503,6 +517,33 @@ impl ConfigOperation {
             ConfigOperation::Update(request) => {
                 Ok(MqttMessage::new(topic, request.to_json()).with_retain())
             }
+        }
+    }
+
+    fn request_from_te_message(
+        config: &ConfigManagerConfig,
+        message: &ThinEdgeMessage,
+    ) -> Result<Option<Self>, ConfigManagementError> {
+        if message.payload.is_empty() {
+            return Ok(None);
+        }
+
+        match message.channel {
+            Channel::Command {
+                operation: OperationType::ConfigUpdate,
+                ..
+            } => Ok(Some(ConfigOperation::Update(
+                ConfigUpdateCmdPayload::from_json(std::str::from_utf8(&message.payload)?)?,
+            ))),
+            Channel::Command {
+                operation: OperationType::ConfigSnapshot,
+                ..
+            } => Ok(Some(ConfigOperation::Snapshot(
+                ConfigSnapshotCmdPayload::from_json(std::str::from_utf8(&message.payload)?)?,
+            ))),
+            _ => Err(ConfigManagementError::Other(anyhow::anyhow!(
+                "invalid message"
+            ))),
         }
     }
 }

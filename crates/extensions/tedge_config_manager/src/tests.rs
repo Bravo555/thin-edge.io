@@ -12,7 +12,9 @@ use tedge_actors::NoMessage;
 use tedge_actors::Sender;
 use tedge_actors::SimpleMessageBox;
 use tedge_actors::SimpleMessageBoxBuilder;
+use tedge_api::ThinEdgeMessage;
 use tedge_downloader_ext::DownloadResponse;
+use tedge_entity_mqtt_ext::EntityMqttActor;
 use tedge_file_system_ext::FsWatchEvent;
 use tedge_mqtt_ext::MqttMessage;
 use tedge_mqtt_ext::Topic;
@@ -89,6 +91,7 @@ async fn new_config_manager_builder(
         config_snapshot_topic: TopicFilter::new_unchecked("te/device/main///cmd/config_snapshot/+"),
         config_update_topic: TopicFilter::new_unchecked("te/device/main///cmd/config_update/+"),
         config_update_enabled: true,
+        mqtt_device_topic_id: "device/main//".parse().unwrap(),
     };
 
     let mut mqtt_builder: SimpleMessageBoxBuilder<MqttMessage, MqttMessage> =
@@ -102,12 +105,16 @@ async fn new_config_manager_builder(
     let mut uploader_builder: SimpleMessageBoxBuilder<ConfigUploadRequest, ConfigUploadResult> =
         SimpleMessageBoxBuilder::new("Uploader", 5);
 
+    let mut entity_mqtt_actor =
+        SimpleMessageBoxBuilder::<ThinEdgeMessage, ThinEdgeMessage>::new("Entity MQTT", 5);
+
     let config_builder = ConfigManagerBuilder::try_new(
         config,
         &mut mqtt_builder,
         &mut fs_watcher_builder,
         &mut downloader_builder,
         &mut uploader_builder,
+        &mut entity_mqtt_actor,
     )
     .await
     .unwrap();

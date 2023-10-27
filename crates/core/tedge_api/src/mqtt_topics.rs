@@ -430,6 +430,12 @@ impl From<EntityTopicId> for ServiceTopicId {
     }
 }
 
+impl From<ServiceTopicId> for EntityTopicId {
+    fn from(value: ServiceTopicId) -> Self {
+        value.0
+    }
+}
+
 impl Display for ServiceTopicId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(self.as_str())
@@ -670,11 +676,13 @@ pub enum ChannelError {
     InvalidCategory(String),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EntityFilter<'a> {
     AnyEntity,
     Entity(&'a EntityTopicId),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ChannelFilter {
     EntityMetadata,
     Measurement,

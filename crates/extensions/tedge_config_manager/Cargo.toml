@@ -22,6 +22,7 @@ tedge_actors = { workspace = true }
 tedge_api = { workspace = true }
 tedge_config = { workspace = true }
 tedge_downloader_ext = { workspace = true }
+tedge_entity_mqtt_ext = { workspace = true }
 tedge_file_system_ext = { workspace = true }
 tedge_mqtt_ext = { workspace = true }
 tedge_uploader_ext = { workspace = true }

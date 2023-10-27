@@ -17,6 +17,7 @@ use tedge_config_manager::ConfigManagerBuilder;
 use tedge_config_manager::ConfigManagerConfig;
 use tedge_config_manager::ConfigManagerOptions;
 use tedge_downloader_ext::DownloaderActor;
+use tedge_entity_mqtt_ext::EntityMqttActor;
 use tedge_file_system_ext::FsWatchActorBuilder;
 use tedge_health_ext::HealthMonitorBuilder;
 use tedge_mqtt_ext::MqttActorBuilder;
@@ -100,11 +101,7 @@ async fn run_with(
         "{PLUGIN_NAME}#{mqtt_topic_root}/{mqtt_device_topic_id}",
     )));
 
-    let mut fs_watch_actor = FsWatchActorBuilder::new();
-
-    // TODO: take a user-configurable service topic id
     let mqtt_device_topic_id = mqtt_device_topic_id.parse::<EntityTopicId>().unwrap();
-
     let service_topic_id = mqtt_device_topic_id
         .to_default_service_topic_id(PLUGIN_NAME)
         .with_context(|| {
@@ -112,6 +109,18 @@ async fn run_with(
                 "Device topic id {mqtt_device_topic_id} currently needs default scheme, e.g: 'device/DEVICE_NAME//'",
             )
         })?;
+
+    let entity_mqtt_config = tedge_entity_mqtt_ext::MqttConfig::try_from(&tedge_config.mqtt)?;
+    let mut entity_mqtt_actor = EntityMqttActor::builder(
+        entity_mqtt_config,
+        &mut mqtt_actor,
+        service_topic_id.clone().into(),
+        tedge_config.service.ty.clone(),
+    );
+
+    let mut fs_watch_actor = FsWatchActorBuilder::new();
+
+    // TODO: take a user-configurable service topic id
     let service = Service {
         service_topic_id,
         device_topic_id: DeviceTopicId::new(mqtt_device_topic_id.clone()),
@@ -145,6 +154,7 @@ async fn run_with(
         &mut fs_watch_actor,
         &mut downloader_actor,
         &mut uploader_actor,
+        &mut entity_mqtt_actor,
     )
     .await?;
 
@@ -159,6 +169,7 @@ async fn run_with(
     runtime.spawn(config_actor).await?;
     runtime.spawn(signal_actor).await?;
     runtime.spawn(health_actor).await?;
+    runtime.spawn(entity_mqtt_actor).await?;
 
     runtime.run_to_completion().await?;
     Ok(())

@@ -36,6 +36,7 @@ pub struct ConfigManagerConfig {
     pub config_reload_topics: TopicFilter,
     pub config_update_topic: TopicFilter,
     pub config_snapshot_topic: TopicFilter,
+    pub mqtt_device_topic_id: EntityTopicId,
 
     /// If enabled, config file updates are deployed by tedge-write.
     pub use_tedge_write: TedgeWriteStatus,
@@ -89,6 +90,7 @@ impl ConfigManagerConfig {
             config_reload_topics,
             config_update_topic,
             config_snapshot_topic,
+            mqtt_device_topic_id,
             use_tedge_write: TedgeWriteStatus::Enabled {
                 sudo: cliopts.is_sudo_enabled,
             },

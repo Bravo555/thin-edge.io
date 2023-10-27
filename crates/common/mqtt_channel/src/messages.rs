@@ -41,7 +41,7 @@ where
 }
 
 #[derive(Clone, Eq, PartialEq)]
-pub struct DebugPayload(Payload);
+pub struct DebugPayload(pub Payload);
 
 impl Debug for DebugPayload {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

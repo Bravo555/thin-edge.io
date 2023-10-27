@@ -43,6 +43,7 @@ use tedge_config_manager::ConfigManagerBuilder;
 use tedge_config_manager::ConfigManagerConfig;
 use tedge_config_manager::ConfigManagerOptions;
 use tedge_downloader_ext::DownloaderActor;
+use tedge_entity_mqtt_ext::EntityMqttActor;
 use tedge_file_system_ext::FsWatchActorBuilder;
 use tedge_health_ext::HealthMonitorBuilder;
 use tedge_log_manager::LogManagerBuilder;
@@ -261,7 +262,7 @@ impl Agent {
         let service_topic_id = self.config.mqtt_device_topic_id.to_default_service_topic_id("tedge-agent")
             .with_context(|| format!("Device topic id {} currently needs default scheme, e.g: 'device/DEVICE_NAME//'", self.config.mqtt_device_topic_id))?;
         let service = Service {
-            service_topic_id,
+            service_topic_id: service_topic_id.clone(),
             device_topic_id: DeviceTopicId::new(self.config.mqtt_device_topic_id.clone()),
         };
         let mqtt_schema = MqttSchema::with_root(self.config.mqtt_topic_root.to_string());
@@ -270,6 +271,16 @@ impl Agent {
             &mut mqtt_actor_builder,
             &mqtt_schema,
             &self.config.service,
+        );
+
+        let mut entity_mqtt_actor = EntityMqttActor::builder(
+            tedge_entity_mqtt_ext::MqttConfig {
+                topic_root: self.config.mqtt_topic_root,
+                device_topic_id: self.config.mqtt_device_topic_id.clone(),
+            },
+            &mut mqtt_actor_builder,
+            service_topic_id.into(),
+            self.config.service.ty,
         );
 
         // Tedge to Te topic converter
@@ -291,6 +302,7 @@ impl Agent {
                     is_sudo_enabled: self.config.is_sudo_enabled,
                     config_update_enabled: self.config.capabilities.config_update,
                 })?;
+
                 Some(
                     ConfigManagerBuilder::try_new(
                         manager_config,
@@ -298,6 +310,7 @@ impl Agent {
                         &mut fs_watch_actor_builder,
                         &mut downloader_actor_builder,
                         &mut uploader_actor_builder,
+                        &mut entity_mqtt_actor,
                     )
                     .await?,
                 )
@@ -371,6 +384,7 @@ impl Agent {
         runtime.spawn(script_runner).await?;
         runtime.spawn(converter_actor_builder).await?;
         runtime.spawn(health_actor).await?;
+        runtime.spawn(entity_mqtt_actor).await?;
 
         runtime.run_to_completion().await?;
 
