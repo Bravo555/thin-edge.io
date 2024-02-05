@@ -24,6 +24,13 @@ jobs:
     env:
       RUSTFLAGS: -D warnings
     steps:
+      - name: Reclaim some disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf /opt/hostedtoolcache
+
       - name: Checkout
         uses: actions/checkout@v4
 
