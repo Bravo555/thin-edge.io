@@ -378,6 +378,60 @@ pub fn change_user_and_group(file: &Path, user: &str, group: &str) -> Result<(),
     Ok(())
 }
 
+/// Changes owning user/group of a file, but uses shell commands instead of libc to extract uid from
+/// the username.
+///
+/// It may be necessary because libc may not be aware of how certain distributions like Fedora IoT
+/// use an immutable filesystem, which can result in changes to users/groups not being immediately
+/// visible.
+pub fn change_user_and_group_by_shell(
+    file: &Path,
+    user: &str,
+    group: &str,
+) -> Result<(), FileError> {
+    debug!(
+        "Changing ownership of file: {:?} with user: {} and group: {}",
+        file, user, group
+    );
+    let file_metadata = get_metadata(Path::new(file))?;
+
+    // let uid = get_uid_by_name(user)?;
+    let output = std::process::Command::new("id").arg("-u").output()?;
+    let stdout = std::str::from_utf8(&output.stdout).expect("id -u should return utf-8 output");
+    // if stdout is not a single int, it means that such user/group doesn't exist
+    let uid = stdout.parse().map_err(|_| FileError::UserNotFound {
+        user: user.to_string(),
+    })?;
+
+    let uid = if uid == file_metadata.st_uid() {
+        None
+    } else {
+        Some(Uid::from_raw(uid))
+    };
+
+    // let gid = get_gid_by_name(group)?;
+    let output = std::process::Command::new("id").arg("-g").output()?;
+    let stdout = std::str::from_utf8(&output.stdout).expect("id -g should return utf-8 output");
+    // if stdout is not a single int, it means that such user/group doesn't exist
+    let gid = stdout.parse().map_err(|_| FileError::GroupNotFound {
+        group: group.to_string(),
+    })?;
+
+    let gid = if gid == file_metadata.st_gid() {
+        None
+    } else {
+        Some(Gid::from_raw(gid))
+    };
+
+    // if user and group are same as existing, then do not change
+    chown(file, uid, gid).map_err(|e| FileError::MetaDataError {
+        name: file.display().to_string(),
+        from: e.into(),
+    })?;
+
+    Ok(())
+}
+
 fn change_user(file: &Path, user: &str) -> Result<(), FileError> {
     let ud = get_user_by_name(user)
         .map(|u| u.uid())
