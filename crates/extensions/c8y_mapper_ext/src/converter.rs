@@ -99,6 +99,7 @@ use tokio::time::Duration;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
+use tracing::instrument;
 use tracing::trace;
 use tracing::warn;
 
@@ -120,6 +121,7 @@ pub struct MapperConfig {
 }
 
 impl CumulocityConverter {
+    #[instrument(skip(self, input), fields(self.entity_store, topic = ?input.topic.name))]
     pub async fn convert(&mut self, input: &Message) -> Vec<Message> {
         let messages_or_err = self.try_convert(input).await;
         self.wrap_errors(messages_or_err)
