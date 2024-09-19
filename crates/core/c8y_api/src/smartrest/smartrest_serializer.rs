@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::smartrest::csv::fields_to_csv_string;
 use crate::smartrest::error::SmartRestSerializerError;
 use csv::StringRecord;
@@ -10,13 +12,50 @@ use tracing::warn;
 
 pub type SmartRest = String;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Smartrest(String);
+
+impl Smartrest {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+pub struct GetPendingOperations;
+
+pub struct SetOperationToExecuting {
+    fragment: String,
+}
+
+pub struct SetOperationToFailed {
+    fragment: String,
+    reason: Option<String>,
+}
+
+pub struct SetOperationToSuccessful {
+    fragment: String,
+}
+
+pub struct SetOperationToExecutingId {
+    operationId: String,
+}
+
+pub struct SetOperationToFailedId {
+    operationId: String,
+    reason: Option<String>,
+}
+
+pub struct SetOperationToSuccessfulId {
+    operationId: String,
+}
+
 pub fn request_pending_operations() -> &'static str {
     "500"
 }
 
 /// Generates a SmartREST message to set the provided operation to executing
-pub fn set_operation_executing_with_name(operation: impl C8yOperation) -> String {
-    fields_to_csv_string(&["501", operation.name()])
+pub fn set_operation_executing_with_name(operation: impl C8yOperation) -> Smartrest {
+    Smartrest(fields_to_csv_string(&["501", operation.name()]))
 }
 
 /// Generates a SmartREST message to set the provided operation ID to executing
@@ -342,7 +381,7 @@ mod tests {
     fn serialize_smartrest_set_operation_to_executing() {
         let smartrest =
             set_operation_executing_with_name(CumulocitySupportedOperations::C8ySoftwareUpdate);
-        assert_eq!(smartrest, "501,c8y_SoftwareUpdate");
+        assert_eq!(smartrest.as_str(), "501,c8y_SoftwareUpdate");
 
         let smartrest = set_operation_executing_with_id("1234");
         assert_eq!(smartrest, "504,1234");
