@@ -1,22 +1,20 @@
 use camino::Utf8Path;
+use tracing::Level;
 
 use crate::system_services::SystemConfig;
 use crate::system_services::SystemServiceError;
 use std::io::IsTerminal;
 use std::str::FromStr;
 
-pub fn get_log_level(
-    sname: &str,
-    config_dir: &Utf8Path,
-) -> Result<tracing::Level, SystemServiceError> {
+pub fn get_log_level(sname: &str, config_dir: &Utf8Path) -> Result<Level, SystemServiceError> {
     let loglevel = SystemConfig::try_new(config_dir)?.log;
     match loglevel.get(sname) {
-        Some(ll) => tracing::Level::from_str(&ll.to_uppercase()).map_err(|_| {
-            SystemServiceError::InvalidLogLevel {
+        Some(ll) => {
+            Level::from_str(&ll.to_uppercase()).map_err(|_| SystemServiceError::InvalidLogLevel {
                 name: ll.to_string(),
-            }
-        }),
-        None => Ok(tracing::Level::INFO),
+            })
+        }
+        None => Ok(Level::INFO),
     }
 }
 
@@ -25,11 +23,13 @@ pub fn get_log_level(
 ///
 /// Reports all the log events sent either with the `log` crate or the `tracing`
 /// crate.
-pub fn set_log_level(log_level: tracing::Level) {
+pub fn set_log_level(log_level: Level) {
     let subscriber = tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
         .with_ansi(std::io::stderr().is_terminal())
-        .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339());
+        .with_timer(tracing_subscriber::fmt::time::UtcTime::rfc_3339())
+        .with_file(log_level >= Level::DEBUG)
+        .with_line_number(log_level >= Level::DEBUG);
 
     if std::env::var("RUST_LOG").is_ok() {
         subscriber
