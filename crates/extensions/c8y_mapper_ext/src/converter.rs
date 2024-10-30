@@ -7,6 +7,7 @@ use crate::actor::IdDownloadRequest;
 use crate::actor::IdDownloadResult;
 use crate::dynamic_discovery::DiscoverOp;
 use crate::error::ConversionError;
+use crate::error::MessageConversionError;
 use crate::json;
 use crate::operations;
 use crate::operations::OperationHandler;
@@ -121,7 +122,7 @@ pub struct MapperConfig {
 impl CumulocityConverter {
     pub async fn convert(&mut self, input: &MqttMessage) -> Vec<MqttMessage> {
         let messages_or_err = self.try_convert(input).await;
-        self.wrap_errors(messages_or_err)
+        self.wrap_errors_with_input(messages_or_err, input)
     }
 
     pub fn wrap_errors(
@@ -131,8 +132,26 @@ impl CumulocityConverter {
         messages_or_err.unwrap_or_else(|error| vec![self.new_error_message(error)])
     }
 
-    pub fn wrap_error(&self, message_or_err: Result<MqttMessage, ConversionError>) -> MqttMessage {
-        message_or_err.unwrap_or_else(|error| self.new_error_message(error))
+    pub fn wrap_errors_with_input(
+        &self,
+        messages_or_err: Result<Vec<MqttMessage>, ConversionError>,
+        input: &MqttMessage,
+    ) -> Vec<MqttMessage> {
+        let error = match messages_or_err {
+            Ok(messages) => return messages,
+            Err(error) => error,
+        };
+
+        let error = MessageConversionError {
+            error,
+            topic: input.topic.name.clone(),
+        };
+
+        error!("Mapping error: {}", error);
+        let error_message =
+            MqttMessage::new(&self.get_mapper_config().errors_topic, error.to_string());
+
+        vec![error_message]
     }
 
     pub fn new_error_message(&self, error: ConversionError) -> MqttMessage {
@@ -1183,11 +1202,8 @@ impl CumulocityConverter {
                 Ok(vec![])
             }
             _ => {
-                let result = self
-                    .try_convert_data_message(source, channel, message)
-                    .await;
-                let messages = self.wrap_errors(result);
-                Ok(messages)
+                self.try_convert_data_message(source, channel, message)
+                    .await
             }
         }
     }
