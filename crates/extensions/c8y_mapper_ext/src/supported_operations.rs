@@ -13,15 +13,15 @@
 //! For known c8y operations, the file can be empty. For custom c8y operations, the file should contain a
 //! [`OnMessageExec`] section describing how c8y mapper should convert this c8y operation to a local thin-edge command.
 
-use crate::json_c8y_deserializer::C8yDeviceControlTopic;
-use crate::smartrest::error::OperationsError;
-use crate::smartrest::smartrest_serializer::declare_supported_operations;
 use anyhow::ensure;
 use anyhow::Context;
+use c8y_api::json_c8y_deserializer::C8yDeviceControlTopic;
+use c8y_api::smartrest::error::OperationsError;
+use c8y_api::smartrest::payload::SmartrestPayload;
+use c8y_api::smartrest::smartrest_serializer::declare_supported_operations;
+use c8y_api::smartrest::topic::C8yTopic;
 use camino::Utf8Path;
 use camino::Utf8PathBuf;
-use mqtt_channel::MqttMessage;
-use mqtt_channel::TopicFilter;
 use serde::Deserialize;
 use serde::Deserializer;
 use std::collections::BTreeMap;
@@ -34,12 +34,11 @@ use std::sync::Arc;
 use std::time::Duration;
 use tedge_api::substitution::Record;
 use tedge_config::TopicPrefix;
+use tedge_mqtt_ext::MqttMessage;
+use tedge_mqtt_ext::TopicFilter;
 use tedge_utils::file;
 use tracing::error;
 use tracing::warn;
-
-use super::payload::SmartrestPayload;
-use super::topic::C8yTopic;
 
 const DEFAULT_GRACEFUL_TIMEOUT: Duration = Duration::from_secs(3600);
 const DEFAULT_FORCEFUL_TIMEOUT: Duration = Duration::from_secs(60);
