@@ -15,6 +15,11 @@ mod tests {
     }
 
     #[test]
+    fn dummy_ci_test() {
+        panic!("we fail the test to check if it's run")
+    }
+
+    #[test]
     fn run_help() -> Result<(), Box<dyn std::error::Error>> {
         let mut cmd = tedge_command(["--help"])?;
 
