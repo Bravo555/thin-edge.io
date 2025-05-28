@@ -48,8 +48,10 @@ jobs:
       - name: Check disk space after freeing
         run: df -BM
 
-      - name: Checkout
+      - name: Checkout correct branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Retrieve MSRV from workspace Cargo.toml
         id: rust_version
