@@ -25,6 +25,7 @@ pub fn log_init(
     flags: &LogConfigArgs,
     config_dir: &Utf8Path,
 ) -> Result<(), SystemTomlError> {
+    // test
     // General logging
     let log_layer = tracing_subscriber::fmt::layer()
         .with_writer(std::io::stderr)
