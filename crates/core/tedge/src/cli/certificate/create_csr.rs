@@ -4,6 +4,7 @@ use crate::log::MaybeFancy;
 use crate::override_public_key;
 use crate::persist_new_private_key;
 use crate::reuse_private_key;
+use anyhow::Context;
 use camino::Utf8PathBuf;
 use certificate::parse_root_certificate::CryptokiConfig;
 use certificate::CsrTemplate;
@@ -23,6 +24,9 @@ pub struct CreateCsrCmd {
 
     /// The path where the device CSR will be stored
     pub csr_path: Utf8PathBuf,
+
+    /// Path to current certificate, if it exists
+    pub current_cert: Option<Utf8PathBuf>,
 
     /// The owner of the private key
     pub user: String,
@@ -63,7 +67,11 @@ impl CreateCsrCmd {
                 .await
                 .map_err(|e| CertError::IoError(e).key_context(key_path.clone()))?,
 
-            Key::Cryptoki(config) => KeyKind::from_cryptoki(config.clone())?,
+            Key::Cryptoki(config) => KeyKind::from_cryptoki(
+                config.clone(),
+                self.current_cert.as_ref().map(|p| p.as_path()),
+            )
+            .context("cryptoki")?,
         };
         debug!(?previous_key);
 
@@ -111,6 +119,7 @@ mod tests {
             user: "mosquitto".to_string(),
             group: "mosquitto".to_string(),
             csr_template: CsrTemplate::default(),
+            current_cert: None,
         };
 
         assert_matches!(cmd.create_certificate_signing_request().await, Ok(()));
@@ -154,6 +163,7 @@ mod tests {
             user: "mosquitto".to_string(),
             group: "mosquitto".to_string(),
             csr_template: CsrTemplate::default(),
+            current_cert: None,
         };
 
         // create csr using existing private key and device_id from public cert
